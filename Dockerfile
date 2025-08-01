@@ -1,11 +1,19 @@
-FROM n8nio/n8n:latest
+FROM node:20-bullseye
 
-USER root
-
-# Добавляем совместимость с glibc и необходимые пакеты
-RUN apk update && \
-    apk add --no-cache ffmpeg python3 py3-pip git libc6-compat && \
+# Установка Python, ffmpeg, pip и Whisper
+RUN apt-get update && \
+    apt-get install -y ffmpeg python3 python3-pip git && \
     pip3 install --upgrade pip && \
     pip3 install git+https://github.com/openai/whisper.git
 
-USER node
+# Установка n8n
+RUN npm install --location=global n8n
+
+# Создание рабочей директории
+RUN mkdir /root/.n8n
+
+# Открываем порт
+EXPOSE 5678
+
+# Запуск
+CMD ["n8n"]
